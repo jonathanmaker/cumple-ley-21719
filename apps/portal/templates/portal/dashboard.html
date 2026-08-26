@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Panel — cumple21719{% endblock %}
+{% block contenido %}
+<h1>Panel de cumplimiento{% if organizacion %} — {{ organizacion.razon_social }}{% endif %}</h1>
+
+{% if not organizacion %}
+<div class="aviso">
+    Todavía no configuraste los datos de tu organización.
+    <a href="{% url 'portal:onboarding_organizacion' %}">Completar configuración inicial →</a>
+</div>
+{% endif %}
+
+<div class="grilla-tarjetas">
+    <div class="tarjeta-metrica">
+        <span class="numero">{{ actividades_activas }}</span>
+        <span class="etiqueta">Actividades de tratamiento activas</span>
+    </div>
+    <div class="tarjeta-metrica">
+        <span class="numero">{{ consentimientos_otorgados }}</span>
+        <span class="etiqueta">Consentimientos otorgados vigentes</span>
+    </div>
+</div>
+
+<h2>Solicitudes ARCO pendientes</h2>
+{% if arco_pendientes %}
+<table class="tabla">
+    <thead><tr><th>Titular</th><th>Derecho</th><th>Vence</th><th></th></tr></thead>
+    <tbody>
+    {% for s in arco_pendientes %}
+        <tr>
+            <td>{{ s.titular.nombre|default:s.titular_id }}</td>
+            <td>{{ s.get_tipo_derecho_display }}</td>
+            <td>{{ s.fecha_limite|date:"d-m-Y" }}</td>
+            <td><a href="{% url 'portal:arco_detalle' s.pk %}">Ver →</a></td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+<p><a href="{% url 'portal:arco_lista' %}">Ver todas las solicitudes →</a></p>
+{% else %}
+<p>No hay solicitudes ARCO pendientes.</p>
+{% endif %}
+
+<h2>Últimos eventos de auditoría</h2>
+<ul class="lista-eventos">
+{% for e in ultimos_eventos %}
+    <li><strong>{{ e.timestamp|date:"d-m-Y H:i" }}</strong> — {{ e.modulo }}: {{ e.get_accion_display }} — {{ e.descripcion }}</li>
+{% empty %}
+    <li>Sin eventos registrados todavía.</li>
+{% endfor %}
+</ul>
+{% endblock %}

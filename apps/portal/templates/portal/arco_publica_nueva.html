@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Ejercer mis derechos sobre mis datos — cumple21719{% endblock %}
+{% block contenido %}
+<div class="tarjeta tarjeta-angosta">
+<h1>Ejercer mis derechos sobre mis datos personales</h1>
+<p>Completa este formulario para ejercer tus derechos de Acceso, Rectificación, Supresión, Oposición, Portabilidad o Bloqueo, conforme a la Ley 21.719. Responderemos dentro de los 30 días corridos siguientes, sin costo.</p>
+<form method="post" class="formulario">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Enviar solicitud</button>
+</form>
+</div>
+{% endblock %}

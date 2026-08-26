@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Configuración inicial — cumple21719{% endblock %}
+{% block contenido %}
+<h1>Paso 1 de 2 — Datos de tu organización</h1>
+<p>Esta información identifica a tu organización como responsable del tratamiento (Art. 2 letra ll) y se usa en reportes de auditoría y notificaciones de brechas.</p>
+<form method="post" class="formulario">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Continuar →</button>
+</form>
+{% endblock %}

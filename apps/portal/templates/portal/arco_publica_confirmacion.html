@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Solicitud recibida — cumple21719{% endblock %}
+{% block contenido %}
+<div class="tarjeta tarjeta-angosta">
+<h1>Solicitud recibida</h1>
+<p>Tu solicitud de <strong>{{ solicitud.get_tipo_derecho_display }}</strong> fue registrada correctamente.</p>
+<p>Folio: <code>{{ solicitud.id }}</code></p>
+<p>Tienes respuesta garantizada antes del <strong>{{ solicitud.fecha_limite|date:"d-m-Y" }}</strong> (30 días corridos desde hoy), sin costo para ti.</p>
+</div>
+{% endblock %}

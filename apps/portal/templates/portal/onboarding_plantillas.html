@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Configuración inicial — cumple21719{% endblock %}
+{% block contenido %}
+<h1>Paso 2 de 2 — ¿Qué procesos maneja tu organización?</h1>
+<p>Selecciona los que apliquen. Por cada uno se creará automáticamente una Actividad de Tratamiento en tu Registro de Actividades de Tratamiento (RAT), con base legal y plazo de conservación sugeridos — podrás ajustarlos después desde la administración.</p>
+<form method="post" class="formulario">
+    {% csrf_token %}
+    {% for plantilla in plantillas %}
+        <label class="opcion-plantilla">
+            <input type="checkbox" name="plantillas" value="{{ plantilla.pk }}">
+            <strong>{{ plantilla.nombre }}</strong> — {{ plantilla.descripcion }}
+        </label>
+    {% empty %}
+        <p>No hay plantillas de proceso cargadas todavía. Puedes crear Actividades de Tratamiento manualmente desde la administración.</p>
+    {% endfor %}
+    <button type="submit">Finalizar configuración</button>
+</form>
+{% endblock %}

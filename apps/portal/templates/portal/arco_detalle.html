@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Solicitud ARCO — cumple21719{% endblock %}
+{% block contenido %}
+<h1>Solicitud ARCO — {{ solicitud.get_tipo_derecho_display }}</h1>
+<dl class="detalle">
+    <dt>Titular</dt><dd>{{ solicitud.titular.nombre|default:solicitud.titular_id }} ({{ solicitud.titular.email|default:"sin correo" }})</dd>
+    <dt>Fecha de solicitud</dt><dd>{{ solicitud.fecha_solicitud|date:"d-m-Y H:i" }}</dd>
+    <dt>Plazo legal (30 días, Art. 11)</dt><dd>{{ solicitud.fecha_limite|date:"d-m-Y" }}</dd>
+    <dt>Canal de ingreso</dt><dd>{{ solicitud.canal_ingreso|default:"—" }}</dd>
+</dl>
+<form method="post" class="formulario">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Guardar</button>
+</form>
+{% endblock %}

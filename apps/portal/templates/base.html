@@ -1,0 +1,29 @@
+{% load static %}<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}cumple21719{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'portal/estilos.css' %}">
+</head>
+<body>
+    {% if user.is_authenticated %}
+    <nav class="nav-principal">
+        <a href="{% url 'portal:dashboard' %}" class="nav-marca">cumple21719</a>
+        <a href="{% url 'portal:arco_lista' %}">Solicitudes ARCO</a>
+        <a href="{% url 'portal:onboarding_organizacion' %}">Organización</a>
+        <a href="/admin/">Administración</a>
+        <form action="{% url 'logout' %}" method="post" class="nav-logout">
+            {% csrf_token %}
+            <button type="submit">Cerrar sesión ({{ user.get_username }})</button>
+        </form>
+    </nav>
+    {% endif %}
+    <main class="contenedor">
+        {% if messages %}
+            {% for message in messages %}<div class="mensaje">{{ message }}</div>{% endfor %}
+        {% endif %}
+        {% block contenido %}{% endblock %}
+    </main>
+</body>
+</html>

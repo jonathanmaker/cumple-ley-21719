@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Solicitudes ARCO — cumple21719{% endblock %}
+{% block contenido %}
+<h1>Solicitudes de Derechos ARCO</h1>
+<div class="filtros">
+    <a href="{% url 'portal:arco_lista' %}">Todas</a>
+    {% for valor, etiqueta in estados %}
+        <a href="?estado={{ valor }}">{{ etiqueta }}</a>
+    {% endfor %}
+</div>
+<table class="tabla">
+    <thead><tr><th>Titular</th><th>Derecho</th><th>Estado</th><th>Vence</th><th></th></tr></thead>
+    <tbody>
+    {% for s in solicitudes %}
+        <tr class="{% if s.estado == 'PENDIENTE' or s.estado == 'EN_PROCESO' %}{% if s.fecha_limite < ahora %}fila-vencida{% endif %}{% endif %}">
+            <td>{{ s.titular.nombre|default:s.titular_id }}</td>
+            <td>{{ s.get_tipo_derecho_display }}</td>
+            <td>{{ s.get_estado_display }}</td>
+            <td>{{ s.fecha_limite|date:"d-m-Y" }}</td>
+            <td><a href="{% url 'portal:arco_detalle' s.pk %}">Ver →</a></td>
+        </tr>
+    {% empty %}
+        <tr><td colspan="5">No hay solicitudes en este estado.</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
