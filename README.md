@@ -85,6 +85,77 @@ python manage.py createsuperuser
 python manage.py runserver
 ```
 
+## Despliegue con la imagen publicada en Docker Hub
+
+Para quien quiera desplegar en un VPS sin clonar el repositorio: la imagen se publica en [`jonathanmaker/software-cumplimiento-ley-de-datos-21719`](https://hub.docker.com/r/jonathanmaker/software-cumplimiento-ley-de-datos-21719) con tags `latest` y por versión (ej. `v0.1.0`). La imagen sola no trae base de datos — igual que en desarrollo, necesita Postgres al lado.
+
+1. Crear una carpeta vacía en el servidor y dentro un archivo `docker-compose.yml`:
+
+    ```yaml
+    services:
+      db:
+        image: postgres:16-alpine
+        environment:
+          POSTGRES_DB: ${POSTGRES_DB:-cumple21719}
+          POSTGRES_USER: ${POSTGRES_USER:-cumple21719}
+          POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?define POSTGRES_PASSWORD en tu archivo .env}
+        volumes:
+          - db_data:/var/lib/postgresql/data
+        healthcheck:
+          test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-cumple21719} -d $${POSTGRES_DB:-cumple21719}"]
+          interval: 5s
+          timeout: 5s
+          retries: 10
+        restart: unless-stopped
+
+      web:
+        image: jonathanmaker/software-cumplimiento-ley-de-datos-21719:v0.1.0
+        command: >
+          sh -c "python manage.py migrate &&
+                 python manage.py collectstatic --noinput &&
+                 gunicorn config.wsgi:application --bind 0.0.0.0:8000"
+        env_file: .env
+        environment:
+          POSTGRES_HOST: db
+        volumes:
+          - media_data:/app/media
+          - static_data:/app/staticfiles
+        ports:
+          - "8000:8000"
+        depends_on:
+          db:
+            condition: service_healthy
+        restart: unless-stopped
+
+    volumes:
+      db_data:
+      media_data:
+      static_data:
+    ```
+
+2. Junto a él, un archivo `.env` (mismo contenido que [.env.example](./.env.example) del repo — no hace falta clonarlo, solo copiar estas líneas y completar los valores):
+
+    ```
+    DJANGO_SECRET_KEY=<generar una clave larga y aleatoria>
+    DJANGO_DEBUG=False
+    DJANGO_ALLOWED_HOSTS=tu-dominio.cl
+
+    POSTGRES_DB=cumple21719
+    POSTGRES_USER=cumple21719
+    POSTGRES_PASSWORD=<clave segura>
+
+    FIELD_ENCRYPTION_KEY=<generar con: python -c "import secrets, base64; print(base64.b64encode(secrets.token_bytes(32)).decode())">
+    ```
+
+3. Levantar y crear el primer usuario:
+
+    ```bash
+    docker compose up -d
+    docker compose exec web python manage.py createsuperuser
+    ```
+
+Para actualizar a una versión nueva, cambiar el tag de la imagen en el `docker-compose.yml` (ej. `v0.2.0`) y correr `docker compose pull && docker compose up -d` — las migraciones se aplican solas al reiniciar el contenedor `web`.
+
 ## Licencia
 
 AGPL-3.0 — ver [LICENSE](./LICENSE).
